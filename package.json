@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-media-server": "^2.4.8"
+    "express": "^5.1.0",
+    "node-media-server": "^2.7.4",
+    "os": "^0.1.2",
+    "path": "^0.12.7"
   }
 }

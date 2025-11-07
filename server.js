@@ -1,12 +1,19 @@
 const NodeMediaServer = require('node-media-server');
+const express = require('express');
+const path = require('path');
 const os = require('os');
 
-// ✅ Automatically set ffmpeg path based on environment
+// ------------------
+// FFmpeg path setup
+// ------------------
 const isWindows = os.platform() === 'win32';
 const ffmpegPath = isWindows
-  ? 'C:\\Users\\Dell\\Downloads\\ffmpeg-2025-11-06-git-222127418b-full_build\\ffmpeg-2025-11-06-git-222127418b-full_build\\bin\\ffmpeg.exe'
-  : '/usr/bin/ffmpeg'; // ✅ Render or any Linux server
+  ? 'C:\\ffmpeg\\bin\\ffmpeg.exe' // adjust if on Windows
+  : '/usr/bin/ffmpeg'; // VPS Linux
 
+// ------------------
+// NodeMediaServer config
+// ------------------
 const config = {
   rtmp: {
     port: 1935,
@@ -16,8 +23,8 @@ const config = {
     ping_timeout: 60,
   },
   http: {
-    port: process.env.PORT || 8000, // ✅ Render will use this dynamic port
-    mediaroot: './media',
+    port: 8000,
+    mediaroot: path.join(__dirname, 'media'),
     allow_origin: '*',
   },
   trans: {
@@ -26,16 +33,35 @@ const config = {
       {
         app: 'live',
         hls: true,
-        hlsFlags: '[hls_time=1:hls_list_size=2:hls_flags=delete_segments]',
+        hlsFlags: '[hls_time=1:hls_list_size=3:hls_flags=delete_segments]',
         dash: false,
       },
     ],
   },
 };
 
+// ------------------
+// Start NodeMediaServer
+// ------------------
 const nms = new NodeMediaServer(config);
 nms.run();
+console.log('✅ NodeMediaServer started!');
+console.log('RTMP URL: rtmp://91.108.110.72:1935/live');
+console.log('HLS URL: http://91.108.110.72:8000/live/test/index.m3u8');
 
-console.log('✅ NodeMediaServer started successfully!');
-console.log('✅ RTMP URL: rtmp://localhost:1935/live');
-console.log('✅ HLS URL:  http://localhost:8000/live/test/index.m3u8');
+// ------------------
+// Express server for HTML player
+// ------------------
+const app = express();
+
+// Serve player.html at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'player.html'));
+});
+
+// Serve media (HLS) files
+app.use('/live', express.static(path.join(__dirname, 'media/live')));
+
+app.listen(3000, () => {
+  console.log('✅ Player running at http://91.108.110.72:3000');
+});
