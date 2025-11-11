@@ -46,8 +46,8 @@ const config = {
 const nms = new NodeMediaServer(config);
 nms.run();
 console.log('✅ NodeMediaServer started!');
-console.log('RTMP URL: rtmp://91.108.110.72:1935/live');
-console.log('HLS URL: http://91.108.110.72:8000/live/test/index.m3u8');
+console.log('RTMP URL: rtmp://72.61.170.227:1935/live');
+console.log('HLS URL: http://72.61.170.227:8000/live/test/index.m3u8');
 
 // ------------------
 // Express server for HTML player
@@ -63,5 +63,5 @@ app.get('/', (req, res) => {
 app.use('/live', express.static(path.join(__dirname, 'media/live')));
 
 app.listen(3000, () => {
-  console.log('✅ Player running at http://91.108.110.72:3000');
+  console.log('✅ Player running at http://72.61.170.227:3000');
 });
